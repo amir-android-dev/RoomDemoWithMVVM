@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.amir.roomdemo.databinding.ActivityMainBinding
 import com.amir.roomdemo.db.SubscriberDAO
 import com.amir.roomdemo.db.SubscriberDatabase
@@ -31,6 +32,11 @@ To create a SubscriberViewModelFactory instance we need to pass a dao instance a
         //Since, we are intending use livedata with data binding, we need to provide a lifecycle owner.
         binding.lifecycleOwner = this
 
+        initRecyclerView()
+    }
+
+    private fun initRecyclerView(){
+        binding.subscriberRecyclerView.layoutManager= LinearLayoutManager(this)
         displaySubscribersList()
     }
 
@@ -38,6 +44,7 @@ To create a SubscriberViewModelFactory instance we need to pass a dao instance a
     private fun displaySubscribersList() {
         subscriberViewModel.getSaveSubscibers().observe(this, Observer {
             Log.i("My Tag", it.toString())
+            binding.subscriberRecyclerView.adapter =RvAdapter(it)
         })
     }
 }
