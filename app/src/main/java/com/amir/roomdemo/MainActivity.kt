@@ -35,10 +35,15 @@ To create a SubscriberViewModelFactory instance we need to pass a dao instance a
         binding.lifecycleOwner = this
 
         initRecyclerView()
+        subscriberViewModel.message.observe(this, Observer {
+            it.getContentIfNotHandled()?.let {
+                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
-    private fun initRecyclerView(){
-        binding.subscriberRecyclerView.layoutManager= LinearLayoutManager(this)
+    private fun initRecyclerView() {
+        binding.subscriberRecyclerView.layoutManager = LinearLayoutManager(this)
         displaySubscribersList()
     }
 
@@ -47,13 +52,14 @@ To create a SubscriberViewModelFactory instance we need to pass a dao instance a
         subscriberViewModel.getSaveSubscibers().observe(this, Observer {
             Log.i("My Tag", it.toString())
             //passing the function as an argument
-            binding.subscriberRecyclerView.adapter =RvAdapter(it,{selectedItem:SubscriberEntity->listItemClicked(selectedItem)})
+            binding.subscriberRecyclerView.adapter =
+                RvAdapter(it, { selectedItem: SubscriberEntity -> listItemClicked(selectedItem) })
         })
     }
 
-    private fun listItemClicked(subscriberEntity: SubscriberEntity){
-        Toast.makeText(this,"selected name is ${subscriberEntity.name}",Toast.LENGTH_SHORT).show()
-subscriberViewModel.initUpdateAndDelete(subscriberEntity)
+    private fun listItemClicked(subscriberEntity: SubscriberEntity) {
+        //Toast.makeText(this,"selected name is ${subscriberEntity.name}",Toast.LENGTH_SHORT).show()
+        subscriberViewModel.initUpdateAndDelete(subscriberEntity)
 
     }
 }
