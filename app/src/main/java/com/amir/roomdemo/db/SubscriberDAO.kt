@@ -17,11 +17,11 @@ can return a long value, which is the new rowId for the inserted item.If the par
     suspend fun updateSubscriber(subscriber: SubscriberEntity):Int
 
     @Delete
-    suspend fun deleteSubscriber(subscriber: SubscriberEntity)
+    suspend fun deleteSubscriber(subscriber: SubscriberEntity):Int
 
 
     @Query("delete from `subscriber_data_table`")
-    suspend fun deleteAll()
+    suspend fun deleteAll():Int
 
 
     @Query("select * from `subscriber_data_table`")
