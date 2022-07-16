@@ -12,10 +12,11 @@ class SubscriberViewModel(private val repository: SubscriberRepository) : ViewMo
     //defining a mutbaleLiveData for the status message
     //we use this variable for string msg
     //but we are using our created event class as a wrapper. therfore the type should be an event of strings
-   private val statusMessage = MutableLiveData<Event<String>>()
+    private val statusMessage = MutableLiveData<Event<String>>()
+
     //creating a getter for this liveData
     val message: LiveData<Event<String>>
-    get() = statusMessage
+        get() = statusMessage
 
 
     val inputName = MutableLiveData<String?>()
@@ -39,7 +40,7 @@ class SubscriberViewModel(private val repository: SubscriberRepository) : ViewMo
     fun saveOrUpdate() {
         if (isUpdatedOrDelete) {
             subscriberEntityToUpdateOrDelete.name = inputName.value!!
-            subscriberEntityToUpdateOrDelete.email=inputEmail.value!!
+            subscriberEntityToUpdateOrDelete.email = inputEmail.value!!
             update(subscriberEntityToUpdateOrDelete)
         } else {
             val name = inputName.value!!
@@ -75,19 +76,28 @@ class SubscriberViewModel(private val repository: SubscriberRepository) : ViewMo
 //        }
 //    }
     fun insert(subscriberEntity: SubscriberEntity): Job = viewModelScope.launch {
-        repository.insert(subscriberEntity)
-        statusMessage.value= Event("Subscriber inserted successfully")
+        val newRowId: Long = repository.insert(subscriberEntity)
+        if (newRowId > -1) {
+            statusMessage.value = Event("Subscriber inserted successfully $newRowId")
+        } else {
+            statusMessage.value = Event("Error Occurred")
+        }
+
     }
 
     fun update(subscriberEntity: SubscriberEntity): Job = viewModelScope.launch {
-        repository.update(subscriberEntity)
-        inputName.value = null
-        inputEmail.value = null
-        isUpdatedOrDelete=false
-        subscriberEntityToUpdateOrDelete=subscriberEntity
-        saveOrUpdateButtonText.value="Save"
-        clearAllOrDeleteButtonText.value="Clear All"
-        statusMessage.value=Event("Subscriber updated successfully")
+        var noOfRows: Int = repository.update(subscriberEntity)
+        if(noOfRows>0) {
+            inputName.value = null
+            inputEmail.value = null
+            isUpdatedOrDelete = false
+            subscriberEntityToUpdateOrDelete = subscriberEntity
+            saveOrUpdateButtonText.value = "Save"
+            clearAllOrDeleteButtonText.value = "Clear All"
+            statusMessage.value = Event("$noOfRows updated successfully")
+        }else{
+            statusMessage.value = Event("Error Occurred")
+        }
     }
 
     fun delete(subscriberEntity: SubscriberEntity): Job = viewModelScope.launch {
@@ -98,12 +108,12 @@ class SubscriberViewModel(private val repository: SubscriberRepository) : ViewMo
         subscriberEntityToUpdateOrDelete = subscriberEntity
         saveOrUpdateButtonText.value = "Save"
         clearAllOrDeleteButtonText.value = "Clear All"
-        statusMessage.value=Event("Subscriber deleted successfully")
+        statusMessage.value = Event("Subscriber deleted successfully")
     }
 
     fun clearAll(): Job = viewModelScope.launch {
         repository.deleteAll()
-        statusMessage.value=Event("All Subscribers deleted successfully")
+        statusMessage.value = Event("All Subscribers deleted successfully")
     }
 
     fun getSaveSubscibers() = liveData {
