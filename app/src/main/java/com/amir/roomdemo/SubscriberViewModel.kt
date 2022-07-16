@@ -1,5 +1,6 @@
 package com.amir.roomdemo
 
+import android.util.Patterns
 import androidx.databinding.Bindable
 import androidx.lifecycle.*
 import com.amir.roomdemo.db.SubscriberEntity
@@ -38,18 +39,26 @@ class SubscriberViewModel(private val repository: SubscriberRepository) : ViewMo
 
     //4
     fun saveOrUpdate() {
-        if (isUpdatedOrDelete) {
-            subscriberEntityToUpdateOrDelete.name = inputName.value!!
-            subscriberEntityToUpdateOrDelete.email = inputEmail.value!!
-            update(subscriberEntityToUpdateOrDelete)
-        } else {
-            val name = inputName.value!!
-            val email = inputEmail.value!!
-            insert(SubscriberEntity(0, name, email))
-            inputName.value = ""
-            inputEmail.value = ""
-        }
 
+        if(inputName.value==null){
+            statusMessage.value = Event("Please Enter name")
+        }else if(inputEmail.value==null){
+            statusMessage.value = Event("Please Enter Email")
+        }else if(!Patterns.EMAIL_ADDRESS.matcher(inputEmail.value!!).matches()){
+            statusMessage.value = Event("Please Enter the correct Email address")
+        }else{
+            if (isUpdatedOrDelete) {
+                subscriberEntityToUpdateOrDelete.name = inputName.value!!
+                subscriberEntityToUpdateOrDelete.email = inputEmail.value!!
+                update(subscriberEntityToUpdateOrDelete)
+            } else {
+                val name = inputName.value!!
+                val email = inputEmail.value!!
+                insert(SubscriberEntity(0, name, email))
+                inputName.value = ""
+                inputEmail.value = ""
+            }
+        }
     }
 
     fun clearAllOrDelete() {
@@ -109,7 +118,7 @@ class SubscriberViewModel(private val repository: SubscriberRepository) : ViewMo
             subscriberEntityToUpdateOrDelete = subscriberEntity
             saveOrUpdateButtonText.value = "Save"
             clearAllOrDeleteButtonText.value = "Clear All"
-            statusMessage.value = Event("$noOfRowsDeleted deleted successfully")
+            statusMessage.value = Event("$noOfRowsDeleted Row deleted successfully")
         }else{
             statusMessage.value = Event("Error Occurred")
         }
