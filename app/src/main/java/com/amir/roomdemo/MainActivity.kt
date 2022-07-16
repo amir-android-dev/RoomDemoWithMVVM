@@ -1,5 +1,6 @@
 package com.amir.roomdemo
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -19,6 +20,12 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     lateinit var subscriberViewModel: SubscriberViewModel
+
+    /*
+    Since we need to refer to this adapter instance, let’s define it as a class level variable.
+     */
+    private lateinit var adapter: RvAdapter
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,16 +51,23 @@ To create a SubscriberViewModelFactory instance we need to pass a dao instance a
 
     private fun initRecyclerView() {
         binding.subscriberRecyclerView.layoutManager = LinearLayoutManager(this)
+        adapter = RvAdapter({ selectedItem: SubscriberEntity -> listItemClicked(selectedItem) })
+        binding.subscriberRecyclerView.adapter = adapter
+
         displaySubscribersList()
     }
 
     //create a function to observe the list of subscribers’ data in the database table
+    @SuppressLint("NotifyDataSetChanged")
     private fun displaySubscribersList() {
         subscriberViewModel.getSaveSubscibers().observe(this, Observer {
             Log.i("My Tag", it.toString())
+            adapter.setList(it)
+            //So, we must tell recycler view , that there is a new update.
+            adapter.notifyDataSetChanged()
             //passing the function as an argument
-            binding.subscriberRecyclerView.adapter =
-                RvAdapter(it, { selectedItem: SubscriberEntity -> listItemClicked(selectedItem) })
+//            binding.subscriberRecyclerView.adapter =
+//                RvAdapter(it, { selectedItem: SubscriberEntity -> listItemClicked(selectedItem) })
         })
     }
 

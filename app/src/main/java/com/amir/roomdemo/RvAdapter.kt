@@ -6,9 +6,12 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.amir.roomdemo.databinding.ListItemBinding
 import com.amir.roomdemo.db.SubscriberEntity
-
-class RvAdapter(private val subscriberEntityList: List<SubscriberEntity>, private val clickListener:(SubscriberEntity)->Unit) :
+/*
+take this subscribersList definition from the constructor and keep it as a reference variable
+ */
+class RvAdapter( private val clickListener:(SubscriberEntity)->Unit) :
     RecyclerView.Adapter<MViewHolder>() {
+    private val subscriberEntityList= ArrayList<SubscriberEntity>()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding: ListItemBinding =
@@ -24,6 +27,13 @@ class RvAdapter(private val subscriberEntityList: List<SubscriberEntity>, privat
     override fun getItemCount(): Int {
 
         return subscriberEntityList.size
+    }
+    //create a function to set the list of subscribers
+    fun setList(subscriberEntity: List<SubscriberEntity>){
+        //to clear the older list and assign the new updated to it
+        subscriberEntityList.clear()
+        subscriberEntityList.addAll(subscriberEntity)
+
     }
 }
 
